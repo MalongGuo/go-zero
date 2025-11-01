@@ -119,8 +119,6 @@ func DoGenProjectWithModule(apiFile, dir, moduleName, moduleDir, style string, w
 
 	var svcRootPkg, svcProjectPkg string
 	svcRootPkg, svcProjectPkg, err = golang.GetParentPackage(moduleDir)
-	fmt.Println(svcRootPkg, svcProjectPkg)
-	fmt.Println(rootPkg, projectPkg)
 	if err != nil {
 		return err
 	}
