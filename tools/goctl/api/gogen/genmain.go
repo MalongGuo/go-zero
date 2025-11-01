@@ -37,7 +37,7 @@ func genMain(dir, rootPkg, projectPkg string, cfg *config.Config, api *spec.ApiS
 		templateFile:    mainTemplateFile,
 		builtinTemplate: mainTemplate,
 		data: map[string]string{
-			"importPackages": genMainImports(rootPkg),
+			"importPackages": genMainImports(rootPkg, projectPkg),
 			"serviceName":    configName,
 			"projectPkg":     projectPkg,
 			"version":        version.BuildVersion,
@@ -45,10 +45,10 @@ func genMain(dir, rootPkg, projectPkg string, cfg *config.Config, api *spec.ApiS
 	})
 }
 
-func genMainImports(parentPkg string) string {
+func genMainImports(parentPkg, projectPkg string) string {
 	var imports []string
 	imports = append(imports, fmt.Sprintf("\"%s\"", pathx.JoinPackages(parentPkg, configDir)))
-	imports = append(imports, fmt.Sprintf("\"%s\"", pathx.JoinPackages(parentPkg, handlerDir)))
+	imports = append(imports, fmt.Sprintf("\"%s\"", pathx.JoinPackages(projectPkg, handlerDir)))
 	imports = append(imports, fmt.Sprintf("\"%s\"\n", pathx.JoinPackages(parentPkg, contextDir)))
 	imports = append(imports, fmt.Sprintf("\"%s/core/conf\"", vars.ProjectOpenSourceURL))
 	imports = append(imports, fmt.Sprintf("\"%s/rest\"", vars.ProjectOpenSourceURL))

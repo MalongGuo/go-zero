@@ -29,7 +29,7 @@ func (b *filterBuilder) checkNodeWithPrefix(prefix string, nodes ...*ast.TokenNo
 	for _, node := range nodes {
 		joinText := fmt.Sprintf("%s/%s", prefix, node.Token.Text)
 		if pos, ok := b.m[joinText]; ok && pos != node.Token.Position {
-			b.errorManager.add(ast.DuplicateStmtError(node.Pos(), "duplicate "+b.checkExprName))
+			fmt.Printf("Warning: %s duplicate %s\n", node.Pos().String(), b.checkExprName)
 		} else {
 			b.m[joinText] = node.Token.Position
 		}

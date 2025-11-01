@@ -73,6 +73,11 @@ func (v *ApiVisitor) panic(expr Expr, msg string) {
 	panic(errString)
 }
 
+func (v *ApiVisitor) warn(expr Expr, msg string) {
+	warnString := fmt.Sprintf("Warning: %s line %d:%d  %s", v.prefix, expr.Line(), expr.Column(), msg)
+	fmt.Println(warnString)
+}
+
 // WithVisitorPrefix returns a VisitorOption wrap with specified prefix
 func WithVisitorPrefix(prefix string) VisitorOption {
 	return func(v *ApiVisitor) {

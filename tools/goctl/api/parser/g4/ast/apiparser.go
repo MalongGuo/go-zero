@@ -304,14 +304,14 @@ func (p *Parser) duplicateRouteCheck(nestedApi *Api) error {
 				return fmt.Errorf("%s handler not exist near line %d", nestedApi.LinePrefix, r.Route.Method.Line())
 			}
 
-			handlerKey := handler.Text()
-			if len(group) > 0 {
-				handlerKey = fmt.Sprintf("%s/%s", group, handler.Text())
-			}
-			if _, ok := p.handlerMap[handlerKey]; ok {
-				return fmt.Errorf("%s line %d:%d duplicate handler '%s'",
-					nestedApi.LinePrefix, handler.Line(), handler.Column(), handlerKey)
-			}
+		handlerKey := handler.Text()
+		if len(group) > 0 {
+			handlerKey = fmt.Sprintf("%s/%s", group, handler.Text())
+		}
+		if _, ok := p.handlerMap[handlerKey]; ok {
+			fmt.Printf("Warning: %s line %d:%d duplicate handler '%s'\n",
+				nestedApi.LinePrefix, handler.Line(), handler.Column(), handlerKey)
+		}
 
 			routeKey := fmt.Sprintf("%s://%s", r.Route.Method.Text(), path.Join(prefix, r.Route.Path.Text()))
 			if _, ok := p.routeMap[routeKey]; ok {

@@ -104,7 +104,7 @@ func (v *ApiVisitor) acceptService(root, final *Api) {
 				handlerKey = fmt.Sprintf("%s/%s", group, handlerExpr.Text())
 			}
 			if _, ok := final.handlerM[handlerKey]; ok {
-				v.panic(handlerExpr, fmt.Sprintf("duplicate handler '%s'", handlerExpr.Text()))
+				v.warn(handlerExpr, fmt.Sprintf("duplicate handler '%s'", handlerExpr.Text()))
 			}
 			final.handlerM[handlerKey] = Holder
 		}

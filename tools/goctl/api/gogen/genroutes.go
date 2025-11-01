@@ -208,7 +208,7 @@ rest.WithPrefix("%s"),`, g.prefix)
 		builtinTemplate: routesTemplate,
 		data: map[string]any{
 			"hasTimeout":      hasTimeout,
-			"importPackages":  genRouteImports(rootPkg, api),
+			"importPackages":  genRouteImports(rootPkg, projectPkg, api),
 			"routesAdditions": strings.TrimSpace(builder.String()),
 			"version":         version.BuildVersion,
 			"projectPkg":      projectPkg,
@@ -226,7 +226,7 @@ func formatDuration(duration time.Duration) string {
 	return fmt.Sprintf("%d * time.Millisecond", duration.Milliseconds())
 }
 
-func genRouteImports(parentPkg string, api *spec.ApiSpec) string {
+func genRouteImports(parentPkg, projectPkg string, api *spec.ApiSpec) string {
 	importSet := collection.NewSet[string]()
 	importSet.Add(fmt.Sprintf("\"%s\"", pathx.JoinPackages(parentPkg, contextDir)))
 	for _, group := range api.Service.Groups {
@@ -239,7 +239,7 @@ func genRouteImports(parentPkg string, api *spec.ApiSpec) string {
 				}
 			}
 			importSet.Add(fmt.Sprintf("%s \"%s\"", toPrefix(folder),
-				pathx.JoinPackages(parentPkg, handlerDir, folder)))
+				pathx.JoinPackages(projectPkg, handlerDir, folder)))
 		}
 	}
 	imports := importSet.Keys()

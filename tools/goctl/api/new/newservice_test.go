@@ -70,9 +70,9 @@ service ` + tt.serviceName + `-api {
 			err = os.WriteFile(apiFile, []byte(apiContent), 0644)
 			require.NoError(t, err)
 
-			// Call the module-aware service creation function
-			err = gogen.DoGenProjectWithModule(apiFile, serviceDir, tt.moduleName, config.DefaultFormat, false)
-			assert.NoError(t, err)
+		// Call the module-aware service creation function
+		err = gogen.DoGenProjectWithModule(apiFile, serviceDir, tt.moduleName, serviceDir, config.DefaultFormat, false)
+		assert.NoError(t, err)
 
 			// Check go.mod file
 			goModPath := filepath.Join(serviceDir, "go.mod")
@@ -185,8 +185,8 @@ service ` + tt.serviceName + `-api {
 			err = os.WriteFile(apiFile, []byte(apiContent), 0644)
 			require.NoError(t, err)
 
-			// Call DoGenProjectWithModule as CreateServiceCommand does
-			err = gogen.DoGenProjectWithModule(apiFile, serviceDir, VarStringModule, VarStringStyle, false)
+		// Call DoGenProjectWithModule as CreateServiceCommand does
+		err = gogen.DoGenProjectWithModule(apiFile, serviceDir, VarStringModule, serviceDir, VarStringStyle, false)
 
 			if tt.shouldError {
 				assert.Error(t, err)

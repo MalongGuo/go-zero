@@ -29,6 +29,13 @@ var (
 	tmpDir = path.Join(os.TempDir(), "goctl")
 	// VarStringDir describes the directory.
 	VarStringDir string
+
+	// VarStringModule describes the module name.
+	VarStringModule string
+
+	// VarStringModuleDir describes the module directory.
+	VarStringModuleDir string
+
 	// VarStringAPI describes the API.
 	VarStringAPI string
 	// VarStringHome describes the go home.
@@ -48,6 +55,8 @@ var (
 func GoCommand(_ *cobra.Command, _ []string) error {
 	apiFile := VarStringAPI
 	dir := VarStringDir
+	moduleName := VarStringModule
+	moduleDir := VarStringModuleDir
 	namingStyle := VarStringStyle
 	home := VarStringHome
 	remote := VarStringRemote
@@ -70,16 +79,16 @@ func GoCommand(_ *cobra.Command, _ []string) error {
 		return errors.New("missing -dir")
 	}
 
-	return DoGenProject(apiFile, dir, namingStyle, withTest)
+	return DoGenProject(apiFile, dir, moduleName, moduleDir, namingStyle, withTest)
 }
 
 // DoGenProject gen go project files with api file
-func DoGenProject(apiFile, dir, style string, withTest bool) error {
-	return DoGenProjectWithModule(apiFile, dir, "", style, withTest)
+func DoGenProject(apiFile, dir, moduleName, moduleDir, style string, withTest bool) error {
+	return DoGenProjectWithModule(apiFile, dir, "", moduleDir, style, withTest)
 }
 
 // DoGenProjectWithModule gen go project files with api file using custom module name
-func DoGenProjectWithModule(apiFile, dir, moduleName, style string, withTest bool) error {
+func DoGenProjectWithModule(apiFile, dir, moduleName, moduleDir, style string, withTest bool) error {
 	api, err := parser.Parse(apiFile)
 	if err != nil {
 		return err
@@ -106,14 +115,24 @@ func DoGenProjectWithModule(apiFile, dir, moduleName, style string, withTest boo
 		return err
 	}
 
+	logx.Must(pathx.MkdirIfNotExist(moduleDir))
+
+	var svcRootPkg, svcProjectPkg string
+	svcRootPkg, svcProjectPkg, err = golang.GetParentPackage(moduleDir)
+	fmt.Println(svcRootPkg, svcProjectPkg)
+	fmt.Println(rootPkg, projectPkg)
+	if err != nil {
+		return err
+	}
+
 	logx.Must(genEtc(dir, cfg, api))
-	logx.Must(genConfig(dir, projectPkg, cfg, api))
-	logx.Must(genMain(dir, rootPkg, projectPkg, cfg, api))
-	logx.Must(genServiceContext(dir, rootPkg, projectPkg, cfg, api))
-	logx.Must(genTypes(dir, cfg, api))
-	logx.Must(genRoutes(dir, rootPkg, projectPkg, cfg, api))
-	logx.Must(genHandlers(dir, rootPkg, projectPkg, cfg, api))
-	logx.Must(genLogic(dir, rootPkg, projectPkg, cfg, api))
+	logx.Must(genConfig(moduleDir, svcProjectPkg, cfg, api))
+	logx.Must(genMain(dir, svcRootPkg, projectPkg, cfg, api))
+	logx.Must(genServiceContext(moduleDir, svcRootPkg, projectPkg, cfg, api))
+	logx.Must(genTypes(moduleDir, cfg, api))
+	logx.Must(genRoutes(dir, svcRootPkg, projectPkg, cfg, api))
+	logx.Must(genHandlers(dir, svcRootPkg, svcProjectPkg, cfg, api))
+	logx.Must(genLogic(moduleDir, svcRootPkg, projectPkg, cfg, api))
 	logx.Must(genMiddleware(dir, cfg, api))
 	if withTest {
 		logx.Must(genHandlersTest(dir, rootPkg, projectPkg, cfg, api))

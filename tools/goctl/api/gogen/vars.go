@@ -1,7 +1,7 @@
 package gogen
 
 const (
-	internal      = "internal/"
+	internal      = ""
 	typesPacket   = "types"
 	configDir     = internal + "config"
 	contextDir    = internal + "svc"
@@ -11,5 +11,5 @@ const (
 	typesDir      = internal + typesPacket
 	groupProperty = "group"
 
-	groupTypeDefault="types"
+	groupTypeDefault = "types"
 )
