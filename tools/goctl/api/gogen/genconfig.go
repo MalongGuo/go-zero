@@ -7,6 +7,7 @@ import (
 
 	"github.com/zeromicro/go-zero/tools/goctl/api/spec"
 	"github.com/zeromicro/go-zero/tools/goctl/config"
+	"github.com/zeromicro/go-zero/tools/goctl/internal/version"
 	"github.com/zeromicro/go-zero/tools/goctl/util/format"
 	"github.com/zeromicro/go-zero/tools/goctl/vars"
 )
@@ -29,7 +30,7 @@ const (
 //go:embed config.tpl
 var configTemplate string
 
-func genConfig(dir string, cfg *config.Config, api *spec.ApiSpec) error {
+func genConfig(dir, projectPkg string, cfg *config.Config, api *spec.ApiSpec) error {
 	filename, err := format.FileNamingFormat(cfg.NamingFormat, configFile)
 	if err != nil {
 		return err
@@ -60,6 +61,8 @@ func genConfig(dir string, cfg *config.Config, api *spec.ApiSpec) error {
 			"authImport": authImportStr,
 			"auth":       strings.Join(auths, "\n"),
 			"jwtTrans":   strings.Join(jwtTransList, "\n"),
+			"projectPkg": projectPkg,
+			"version":    version.BuildVersion,
 		},
 	})
 }

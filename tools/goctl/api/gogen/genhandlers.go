@@ -8,6 +8,7 @@ import (
 
 	"github.com/zeromicro/go-zero/tools/goctl/api/spec"
 	"github.com/zeromicro/go-zero/tools/goctl/config"
+	"github.com/zeromicro/go-zero/tools/goctl/internal/version"
 	"github.com/zeromicro/go-zero/tools/goctl/util"
 	"github.com/zeromicro/go-zero/tools/goctl/util/format"
 	"github.com/zeromicro/go-zero/tools/goctl/util/pathx"
@@ -22,7 +23,7 @@ var (
 	sseHandlerTemplate string
 )
 
-func genHandler(dir, rootPkg string, cfg *config.Config, group spec.Group, route spec.Route) error {
+func genHandler(dir, rootPkg, projectPkg string, cfg *config.Config, group spec.Group, route spec.Route) error {
 	handler := getHandlerName(route)
 	handlerPath := getHandlerFolderPath(group, route)
 	pkgName := handlerPath[strings.LastIndex(handlerPath, "/")+1:]
@@ -37,9 +38,11 @@ func genHandler(dir, rootPkg string, cfg *config.Config, group spec.Group, route
 	}
 
 	var builtinTemplate = handlerTemplate
+	var templateFile = handlerTemplateFile
 	sse := group.GetAnnotation("sse")
 	if sse == "true" {
 		builtinTemplate = sseHandlerTemplate
+		templateFile = sseHandlerTemplateFile
 	}
 
 	return genFile(fileGenConfig{
@@ -48,7 +51,7 @@ func genHandler(dir, rootPkg string, cfg *config.Config, group spec.Group, route
 		filename:        filename + ".go",
 		templateName:    "handlerTemplate",
 		category:        category,
-		templateFile:    handlerTemplateFile,
+		templateFile:    templateFile,
 		builtinTemplate: builtinTemplate,
 		data: map[string]any{
 			"PkgName":        pkgName,
@@ -63,14 +66,16 @@ func genHandler(dir, rootPkg string, cfg *config.Config, group spec.Group, route
 			"HasRequest":     len(route.RequestTypeName()) > 0,
 			"HasDoc":         len(route.JoinedDoc()) > 0,
 			"Doc":            getDoc(route.JoinedDoc()),
+			"projectPkg":     projectPkg,
+			"version":        version.BuildVersion,
 		},
 	})
 }
 
-func genHandlers(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpec) error {
+func genHandlers(dir, rootPkg, projectPkg string, cfg *config.Config, api *spec.ApiSpec) error {
 	for _, group := range api.Service.Groups {
 		for _, route := range group.Routes {
-			if err := genHandler(dir, rootPkg, cfg, group, route); err != nil {
+			if err := genHandler(dir, rootPkg, projectPkg, cfg, group, route); err != nil {
 				return err
 			}
 		}
